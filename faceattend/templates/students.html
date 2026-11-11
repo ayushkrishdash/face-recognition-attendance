@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Students{% endblock %}
+{% block heading %}Student database{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <form class="filters" method="get">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search name or roll number" aria-label="Search students">
+    <select name="class_name" aria-label="Filter by class">
+      <option value="">All classes</option>
+      {% for c in classes %}<option value="{{ c }}" {% if c == class_name %}selected{% endif %}>{{ c }}</option>{% endfor %}
+    </select>
+    <button class="btn" type="submit">Filter</button>
+  </form>
+  {% if g.user.role == 'admin' %}
+  <a class="btn primary" href="{{ url_for('views.student_new') }}"><i data-lucide="user-plus"></i>Add student</a>
+  {% endif %}
+</div>
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Roll no</th><th>Name</th><th>Class</th><th>Face profile</th><th>Consent</th><th></th></tr></thead>
+    <tbody>
+    {% for s in students %}
+      <tr>
+        <td>{{ s.roll_no }}</td>
+        <td><a href="{{ url_for('views.student_detail', student_id=s.id) }}">{{ s.full_name }}</a></td>
+        <td>{{ s.class_name }}{% if s.section %} · {{ s.section }}{% endif %}</td>
+        <td>{% if s.face_template %}<span class="badge present">Enrolled</span>{% else %}<span class="badge muted-badge">Not enrolled</span>{% endif %}</td>
+        <td>{% if s.consent_recorded_at %}<span class="badge present">Recorded</span>{% else %}<span class="badge absent">Missing</span>{% endif %}</td>
+        <td class="actions">
+          <a class="btn small ghost" href="{{ url_for('views.student_detail', student_id=s.id) }}">View</a>
+          {% if g.user.role == 'admin' %}<a class="btn small ghost" href="{{ url_for('views.student_edit', student_id=s.id) }}">Edit</a>{% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="empty">No students found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit student' if student else 'Add student' }}{% endblock %}
+{% block heading %}{{ 'Edit student' if student else 'Add student' }}{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" style="display:grid;gap:20px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid-2">
+    <div class="card">
+      <h2>Student details</h2>
+      <div class="fields">
+        <label>Full name <input name="full_name" required maxlength="120" value="{{ values.get('full_name', '') }}"></label>
+        <label>Roll number <input name="roll_no" required maxlength="32" value="{{ values.get('roll_no', '') }}"></label>
+        <label>Class <input name="class_name" required maxlength="32" value="{{ values.get('class_name', '') }}" placeholder="e.g. 10 or B.Tech CSE-2"></label>
+        <label>Section <input name="section" maxlength="8" value="{{ values.get('section', '') }}"></label>
+      </div>
+      <h2 style="margin-top:22px">Consent</h2>
+      <label class="check"><input type="checkbox" name="consent_confirmed" {% if values.get('consent_confirmed') %}checked{% endif %}> School authorisation and the student's informed consent have been obtained for face-based attendance.</label>
+      <label class="check"><input type="checkbox" name="is_minor" {% if values.get('is_minor') %}checked{% endif %}> Student is under 18</label>
+      <label class="check"><input type="checkbox" name="parental_consent" {% if values.get('parental_consent') %}checked{% endif %}> Parent or guardian has given written consent (required if under 18)</label>
+      <p class="muted small">Face capture requires recorded consent. Withdrawing consent deletes the face profile. Students without a face profile can still be marked manually.</p>
+    </div>
+    <div class="card">
+      {% include "_face_camera.html" %}
+    </div>
+  </div>
+  <div class="form-actions">
+    <a class="btn ghost" href="{{ url_for('views.students') }}">Cancel</a>
+    <button class="btn primary" type="submit">{{ 'Save changes' if student else 'Register student' }}</button>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/face_capture.js') }}"></script>
+{% endblock %}

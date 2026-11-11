@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Attendance records{% endblock %}
+{% block heading %}Attendance records{% endblock %}
+{% block content %}
+<form class="card filters-wide" method="get">
+  <input type="search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Name or roll number" aria-label="Search">
+  <select name="class_name" aria-label="Class">
+    <option value="">All classes</option>
+    {% for c in classes %}<option value="{{ c }}" {% if request.args.get('class_name') == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+  </select>
+  <select name="status" aria-label="Status">
+    <option value="">All statuses</option>
+    <option value="present" {% if request.args.get('status') == 'present' %}selected{% endif %}>Present</option>
+    <option value="late" {% if request.args.get('status') == 'late' %}selected{% endif %}>Late</option>
+    <option value="absent" {% if request.args.get('status') == 'absent' %}selected{% endif %}>Absent</option>
+  </select>
+  <label style="display:flex;align-items:center;gap:6px">From <input type="date" name="date_from" value="{{ request.args.get('date_from', '') }}"></label>
+  <label style="display:flex;align-items:center;gap:6px">To <input type="date" name="date_to" value="{{ request.args.get('date_to', '') }}"></label>
+  <button class="btn primary" type="submit">Apply</button>
+  <a class="btn ghost" href="{{ url_for('views.records') }}">Reset</a>
+</form>
+
+<div class="toolbar">
+  <p class="muted" style="margin:0">
+    {{ rows|length }} rows · Present {{ counts.present }} · Late {{ counts.late }} · Absent {{ counts.absent }}
+    {% if not single_day %}<span class="small"> · Absent rows appear when a single date is selected.</span>{% endif %}
+  </p>
+  <div class="btn-row" style="margin:0">
+    <a class="btn" href="{{ url_for('views.records_export') }}?format=csv&{{ qs }}"><i data-lucide="file-text"></i>Export CSV</a>
+    <a class="btn" href="{{ url_for('views.records_export') }}?format=xlsx&{{ qs }}"><i data-lucide="file-spreadsheet"></i>Export Excel</a>
+  </div>
+</div>
+
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Date</th><th>Roll no</th><th>Name</th><th>Class</th><th>Check-in</th><th>Status</th><th>Method</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>{{ r.date }}</td>
+        <td>{{ r.roll_no }}</td>
+        <td><a href="{{ url_for('views.student_detail', student_id=r.student_id) }}">{{ r.name }}</a></td>
+        <td>{{ r.class_name }}{% if r.section %} · {{ r.section }}{% endif %}</td>
+        <td>{{ r.check_in }}</td>
+        <td><span class="badge {{ r.status }}">{{ r.status|capitalize }}</span></td>
+        <td>{{ r.method }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="empty">No records match these filters.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

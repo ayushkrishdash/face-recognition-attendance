@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Take attendance{% endblock %}
+{% block heading %}Take attendance{% endblock %}
+{% block content %}
+<div class="attend-layout">
+  <section class="card">
+    <div class="panel-head">
+      <h2>Camera</h2>
+      <span id="camStatus" class="status-pill">Camera off</span>
+    </div>
+    <div class="camera-stage">
+      <video id="liveVideo" playsinline muted hidden></video>
+      <div class="scan-frame" aria-hidden="true"></div>
+      <div class="stage-empty" id="stageEmpty">
+        <i data-lucide="camera-off"></i>
+        <p>Press <strong>Start camera</strong>. Only enrolled, consenting students are verified.</p>
+      </div>
+    </div>
+    <div id="camError" class="form-error" role="alert" hidden></div>
+    <div class="btn-row">
+      <button class="btn primary" id="startCam"><i data-lucide="video"></i>Start camera</button>
+      <button class="btn" id="scanNow" disabled><i data-lucide="scan"></i>Scan now</button>
+      <button class="btn ghost" id="stopCam" disabled>Stop</button>
+      <label style="display:flex;align-items:center;gap:8px;font-weight:600">
+        <input type="checkbox" id="autoScan" checked> Auto-scan
+      </label>
+    </div>
+    <p class="hint" id="scanHint"></p>
+  </section>
+
+  <section class="card" id="resultCard" aria-live="polite"></section>
+</div>
+
+<div class="grid-2">
+  <section class="card">
+    <div class="panel-head"><h2>Marked today <span id="todayCount" class="count">0</span></h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Roll</th><th>Class</th><th>Time</th><th>Status</th><th>Method</th></tr></thead>
+        <tbody id="todayBody"></tbody>
+      </table>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Manual attendance</h2>
+    <p class="muted small">Use when the camera is unavailable or for students without a face profile. Each action is logged.</p>
+    <input type="search" id="manualSearch" placeholder="Search unmarked students" style="width:100%">
+    <ul class="list" id="unmarkedList"></ul>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/attendance.js') }}"></script>
+{% endblock %}

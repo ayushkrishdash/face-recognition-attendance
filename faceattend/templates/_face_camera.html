@@ -1,0 +1,17 @@
+<div class="panel-head">
+  <h2>Face capture</h2>
+  {% if student and student.face_template %}<span class="badge present">Enrolled</span>{% else %}<span class="badge muted-badge">Not enrolled</span>{% endif %}
+</div>
+<p class="muted small">Capture only with the student's consent. The photo is converted to an encrypted template and discarded; it is not stored.</p>
+<div class="camera-stage small-stage">
+  <video id="faceVideo" playsinline muted hidden></video>
+  <img id="facePreview" alt="Captured face preview" hidden>
+  <div class="scan-frame" aria-hidden="true"></div>
+</div>
+<div class="btn-row">
+  <button type="button" class="btn" id="faceStart"><i data-lucide="video"></i>Start camera</button>
+  <button type="button" class="btn primary" id="faceCapture" disabled><i data-lucide="aperture"></i>Capture</button>
+  <button type="button" class="btn ghost" id="faceRetake" hidden>Retake</button>
+</div>
+<p class="form-error" id="faceError" role="alert" hidden></p>
+<input type="file" name="face_image" id="faceInput" accept="image/jpeg" hidden>

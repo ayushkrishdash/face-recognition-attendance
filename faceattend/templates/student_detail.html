@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ student.full_name }}{% endblock %}
+{% block heading %}Student profile{% endblock %}
+{% block content %}
+<section class="card profile-head">
+  <div class="avatar">{{ student.full_name[:1] }}</div>
+  <div>
+    <h2>{{ student.full_name }}</h2>
+    <p class="muted" style="margin:4px 0 0">Roll {{ student.roll_no }} · {{ student.class_name }}{% if student.section %} · {{ student.section }}{% endif %}</p>
+  </div>
+  <div class="profile-stats">
+    <div><strong>{{ percent }}%</strong><span>Attendance</span></div>
+    <div><strong>{{ records|length }}</strong><span>Days marked</span></div>
+    <div><strong>{{ absent_days }}</strong><span>Days absent</span></div>
+  </div>
+  {% if g.user.role == 'admin' %}
+  <div class="actions">
+    <a class="btn" href="{{ url_for('views.student_edit', student_id=student.id) }}"><i data-lucide="pencil"></i>Edit</a>
+    <form method="post" action="{{ url_for('views.student_delete', student_id=student.id) }}"
+          onsubmit="return confirm('Delete this student, their attendance history and face data? This cannot be undone.')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn danger" type="submit"><i data-lucide="trash-2"></i>Delete</button>
+    </form>
+  </div>
+  {% endif %}
+</section>
+
+<div class="grid-2">
+  <section class="card">
+    <h2>Consent and biometrics</h2>
+    <dl class="kv">
+      <dt>Consent recorded</dt><dd>{{ student.consent_recorded_at.strftime('%d %b %Y') if student.consent_recorded_at else 'No' }}</dd>
+      <dt>Under 18</dt><dd>{{ 'Yes' if student.is_minor else 'No' }}</dd>
+      <dt>Parental consent</dt><dd>{{ 'Yes' if student.parental_consent else 'No' }}</dd>
+      <dt>Face profile</dt><dd>{{ student.face_enrolled_at.strftime('%d %b %Y') if student.face_template else 'Not enrolled' }}</dd>
+    </dl>
+    {% if g.user.role == 'admin' and student.face_template %}
+    <form method="post" action="{{ url_for('views.student_face_remove', student_id=student.id) }}" style="margin-top:16px"
+          onsubmit="return confirm('Delete the face profile? Attendance history is kept.')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn small danger" type="submit"><i data-lucide="shield-off"></i>Delete face data</button>
+    </form>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Attendance history</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Check-in</th><th>Status</th><th>Method</th></tr></thead>
+        <tbody>
+        {% for r in records %}
+          <tr>
+            <td>{{ r.date.strftime('%d %b %Y') }}</td>
+            <td>{{ r.check_in.strftime('%H:%M') }}</td>
+            <td><span class="badge {{ r.status }}">{{ 'Late' if r.status == 'late' else 'Present' }}</span></td>
+            <td>{{ {'face': 'Face', 'face_reviewed': 'Confirmed', 'manual': 'Manual'}.get(r.method, r.method) }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4" class="empty">No attendance recorded yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+{% if g.user.role == 'admin' %}
+<form method="post" action="{{ url_for('views.student_face', student_id=student.id) }}" enctype="multipart/form-data" class="card" style="display:grid;gap:12px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% include "_face_camera.html" %}
+  <div class="form-actions"><button class="btn primary" type="submit">Save face profile</button></div>
+</form>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/face_capture.js') }}"></script>
+{% endblock %}

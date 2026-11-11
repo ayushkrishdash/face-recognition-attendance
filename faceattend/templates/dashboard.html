@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<section class="stats">
+  <div class="card stat">
+    <div class="stat-icon"><i data-lucide="users"></i></div>
+    <div><span>Registered students</span><strong data-stat="total">–</strong><small class="muted"><span data-stat="enrolled">–</span> with face profile</small></div>
+  </div>
+  <div class="card stat ok">
+    <div class="stat-icon"><i data-lucide="circle-check"></i></div>
+    <div><span>Present today</span><strong data-stat="present">–</strong><small class="muted"><span data-stat="late">–</span> late</small></div>
+  </div>
+  <div class="card stat bad">
+    <div class="stat-icon"><i data-lucide="circle-x"></i></div>
+    <div><span>Absent today</span><strong data-stat="absent">–</strong></div>
+  </div>
+  <div class="card stat">
+    <div class="stat-icon"><i data-lucide="percent"></i></div>
+    <div><span>Attendance rate</span><strong data-stat="percent">–</strong><div class="bar"><i id="percentBar"></i></div></div>
+  </div>
+</section>
+
+<section class="grid-2">
+  <div class="card"><h2>Last 7 days</h2><canvas id="trendChart" height="130"></canvas></div>
+  <div class="card"><h2>Today's breakdown</h2><canvas id="todayChart" height="180"></canvas></div>
+</section>
+
+<section class="grid-2">
+  <div class="card">
+    <div class="panel-head"><h2>Live activity</h2><small class="muted">Updated <span id="updated">–</span> · every 10 s</small></div>
+    <ul class="feed" id="liveFeed"></ul>
+  </div>
+  <div class="card">
+    <h2>Recent attendance records</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Student</th><th>Date</th><th>Check-in</th><th>Status</th></tr></thead>
+        <tbody id="recentBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
